@@ -300,17 +300,6 @@
       "count": 1
     }
   },
-  "src/monsters/CureFlow.jsx": {
-    "no-unused-vars": {
-      "count": 1
-    },
-    "react-hooks/purity": {
-      "count": 1
-    },
-    "react-hooks/set-state-in-effect": {
-      "count": 2
-    }
-  },
   "src/monsters/GuidedSolver.jsx": {
     "react-hooks/set-state-in-effect": {
       "count": 1
