@@ -55,6 +55,36 @@ jobs:
       - run: npm ci
       - run: npm run lint
 
+  # Stops the lint baseline from becoming a dumping ground (#277).
+  #
+  # Client lint is green because every pre-existing violation is recorded in
+  # client/eslint-suppressions.json. That only holds while the baseline stays
+  # frozen: the moment someone silences a NEW violation with
+  # `npx eslint . --suppress-all`, the lint job goes green and the defect ships.
+  # The lint job cannot catch that on its own — a suppressed violation is, by
+  # definition, invisible to it — so this job does.
+  #
+  # The baseline may shrink (you fixed something) but must never grow.
+  # Dependency-free: Node built-ins only, so there is no `npm ci` here.
+  #
+  # pull_request only: a growing baseline should block the PR, not turn main red
+  # after the fact.
+  lint-baseline:
+    name: Lint baseline guard
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history, so the base commit's copy of the suppressions file is
+          # available to compare against.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail if the lint baseline grew
+        run: node .github/scripts/check-lint-baseline.js --base ${{ github.event.pull_request.base.sha }}
+
   # API contract tests — uses npm ci so CI fails if lockfile is out of sync.
   server-contract:
     name: API contract tests
