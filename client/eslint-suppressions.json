@@ -206,16 +206,6 @@
       "count": 1
     }
   },
-  "src/monsters/MonsterToast.jsx": {
-    "no-unused-vars": {
-      "count": 3
-    }
-  },
-  "src/monsters/MonsterDetail.jsx": {
-    "react-hooks/set-state-in-effect": {
-      "count": 1
-    }
-  },
   "src/monsters/__tests__/classifier.test.js": {
     "no-undef": {
       "count": 1
