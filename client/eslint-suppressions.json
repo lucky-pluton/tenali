@@ -126,11 +126,6 @@
       "count": 1
     }
   },
-  "src/components/HintSystem/HintModal.jsx": {
-    "react-hooks/set-state-in-effect": {
-      "count": 1
-    }
-  },
   "src/components/HintSystem/useHints.jsx": {
     "no-undef": {
       "count": 1
