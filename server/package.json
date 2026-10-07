@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "vitest run --reporter=verbose",
-    "test:bkt": "node lib/bkt.test.js"
+    "test:bkt": "vitest run lib/bkt.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

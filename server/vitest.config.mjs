@@ -7,7 +7,6 @@ export default defineConfig({
     testTimeout: 15000,
     exclude: [
       '**/node_modules/**',
-      'lib/bkt.test.js',  // plain-node assert file, run via `npm run test:bkt`
     ],
   },
 });
