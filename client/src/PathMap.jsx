@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useEffect, useMemo } from 'react';
 
 // ── Graph Nodes ─────────────────────────────────────────────────────────────
@@ -351,7 +352,7 @@ export function PmQuestBanner({ currentGoal, completedTopics = [], onOpenGoalMod
 }
 
 // ── PmHomeSection ───────────────────────────────────────────────────────────
-export function PmHomeSection({ currentGoal, completedTopics = [], onSelectTopic, onOpenGoalModal }) {
+export function PmHomeSection({ currentGoal, completedTopics = [], onSelectTopic }) {
   const nextTopic = getRecommendedNextTopic(currentGoal, completedTopics);
 
   return (
@@ -433,9 +434,6 @@ export default function PathMap({ onBack, onSelectTopic, completedTopics = [] })
 
   const completedSet = useMemo(() => new Set(completedTopics), [completedTopics]);
   const shortestPath = useMemo(() => findShortestPath('basicarith', targetGoal), [targetGoal]);
-  const shortestPathSet = useMemo(() => new Set(shortestPath), [shortestPath]);
-
-  const goalNode = PATHMAP_NODES.find(n => n.id === targetGoal) || PATHMAP_NODES[0];
 
   return (
     <div className="pathmap-container" style={{ padding: '24px 16px', maxWidth: '900px', margin: '0 auto' }}>
