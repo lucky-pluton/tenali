@@ -2137,10 +2137,7 @@ app.use('/api', labRoutes);
  */
 // Explicit sub-app route for /matrixmystics (#222)
 app.use('/matrixmystics', express.static(clientDistPath));
-app.get('/matrixmystics', (_req, res) => {
-  res.sendFile(path.join(clientDistPath, 'index.html'));
-});
-app.get('/matrixmystics/*', (_req, res) => {
+app.get(/\/matrixmystics.*/, (_req, res) => {
   res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
