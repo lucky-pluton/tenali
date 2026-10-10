@@ -290,6 +290,32 @@ function extractAttemptDetails(req) {
   return { topicKey, questionPrompt, userInput };
 }
 
+const { signQuestionToken, verifyQuestionToken } = require('./lib/questionToken');
+
+// Global anti-farming middleware to sign served questions and verify qTokens on checks (#95)
+app.use((req, res, next) => {
+  if (req.method === 'GET' && req.path.includes('-api/') && req.path.endsWith('/question')) {
+    const originalJson = res.json.bind(res);
+    res.json = function (data) {
+      if (data && typeof data === 'object' && !data.qToken) {
+        data.qToken = signQuestionToken({ path: req.path, q: data });
+      }
+      return originalJson(data);
+    };
+    return next();
+  }
+
+  if (req.method === 'POST' && req.path.includes('-api/check')) {
+    const qToken = req.body?.qToken || req.body?.token;
+    const verification = verifyQuestionToken(qToken);
+    if (!verification.valid) {
+      return res.status(400).json({ error: 'Invalid or missing question token' });
+    }
+  }
+
+  return next();
+});
+
 // Global middleware to log student attempts and accrue scores server-side for all quiz/check APIs (#91)
 app.use((req, res, next) => {
   if (req.method !== 'POST' || !req.path.includes('-api/check')) {
