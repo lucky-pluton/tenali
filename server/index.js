@@ -1881,15 +1881,14 @@ app.post('/api/progress', express.json(), async (req, res) => {
     if (!user) {
       return res.json({ success: true, guest: true });
     }
-    const { completedTopics, goldMastery, coins, totalSolved } = req.body;
-    
+    // #93: Stop trusting client score fields.
+    // Scores and totalSolved are server-authoritative and change only via the ledger.
     const oldCompleted = user.completedTopics || [];
     const oldStreak = user.streak || 0;
-    
-    if (completedTopics) user.completedTopics = completedTopics;
-    if (goldMastery) user.goldMastery = goldMastery;
-    if (coins !== undefined) user.coins = coins;
-    if (totalSolved !== undefined) user.totalSolved = totalSolved;
+
+    if (req.body && req.body.preferences) {
+      user.preferences = req.body.preferences;
+    }
     
     checkDailyStreak(user);
     const newlyCompleted = evaluateCollections(user);
