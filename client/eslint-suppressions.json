@@ -129,20 +129,6 @@
       "count": 2
     }
   },
-  "src/PlaygroundApp.jsx": {
-    "no-empty": {
-      "count": 1
-    },
-    "no-unused-vars": {
-      "count": 2
-    },
-    "no-useless-escape": {
-      "count": 2
-    },
-    "react-hooks/set-state-in-effect": {
-      "count": 3
-    }
-  },
   "src/ProbLabApp.jsx": {
     "react-hooks/set-state-in-effect": {
       "count": 2

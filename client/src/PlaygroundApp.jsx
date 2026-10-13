@@ -689,7 +689,7 @@ function generateVizSteps(code) {
     }
 
     /* ─── if / else if / else ─── */
-    if (/^(if|else\s*if)\s*[\({]/.test(line)) {
+    if (/^(if|else\s*if)\s*[({]/.test(line)) {
       snap(lineNum, line.length > 50 ? line.slice(0, 47) + '...' : line, '?')
       const bodyStart = i + 1
       let bodyEnd = bodyStart
@@ -805,13 +805,12 @@ export default function PlaygroundApp({ onBack }) {
   const [rightPanel, setRightPanel] = useState('terminal')
   const [previewHtml, setPreviewHtml] = useState('')
   const [consoleLogs, setConsoleLogs] = useState([])
-  const [tsWarning, setTsWarning] = useState(null)
   const lastRunTime = useRef(0)
   const codeRef = useRef(null)
 
-  useEffect(() => {
-    if (!isTypeScript(langId)) { setTsWarning(null); return }
-    setTsWarning(detectTsIssues(code))
+  const tsWarning = useMemo(() => {
+    if (!isTypeScript(langId)) return null
+    return detectTsIssues(code)
   }, [code, langId])
 
   const vizSteps = useMemo(() => {
@@ -858,7 +857,7 @@ ${codeStr}
 setTimeout(()=>{
   window.parent.postMessage({type:'pg_preview',logs:_logs,errs:_errs},'*');
 },150);
-<\/script></body></html>`
+</script></body></html>`
     setPreviewHtml(html)
     setConsoleLogs([])
   }, [])
@@ -1368,15 +1367,16 @@ function CodeVizPanel({ steps, code }) {
   const [playing, setPlaying] = useState(false)
   const timerRef = useRef(null)
 
-  useEffect(() => {
+  const [prevCode, setPrevCode] = useState(code)
+  if (prevCode !== code) {
+    setPrevCode(code)
     setActiveStep(0)
     setPlaying(false)
-    if (timerRef.current) clearInterval(timerRef.current)
-  }, [code])
+  }
 
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [])
+  }, [code])
 
   const togglePlay = useCallback(() => {
     if (playing) {
@@ -1644,22 +1644,25 @@ function History({ output, langId, code, stdin, onLoad }) {
   const [history, setHistory] = useState([])
   const [viewing, setViewing] = useState(null)
 
-  useEffect(() => {
-    if (!output) return
-    const entry = {
-      id: Date.now(),
-      lang: getLangName(langId),
-      langId,
-      code,
-      stdin: stdin || '',
-      status: output.status?.description || 'Unknown',
-      statusId: output.status?.id,
-      time: output.time,
-      memory: output.memory,
-      stdout: output.stdout || '',
+  const [prevOutput, setPrevOutput] = useState(output)
+  if (prevOutput !== output) {
+    setPrevOutput(output)
+    if (output) {
+      const entry = {
+        id: `${history.length + 1}-${output.status?.id || 0}-${output.time || ''}`,
+        lang: getLangName(langId),
+        langId,
+        code,
+        stdin: stdin || '',
+        status: output.status?.description || 'Unknown',
+        statusId: output.status?.id,
+        time: output.time,
+        memory: output.memory,
+        stdout: output.stdout || '',
+      }
+      setHistory(prev => [entry, ...prev].slice(0, 10))
     }
-    setHistory(prev => [entry, ...prev].slice(0, 10))
-  }, [output, langId])
+  }
 
   if (history.length === 0) return null
 
