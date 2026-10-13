@@ -125,7 +125,7 @@ Learning JSON → learnContent.js → Learning Page → Interactive Components
 
 Tenali (named after the legendary **Tenali Raman** — the witty Indian scholar who outwitted entire courts with logic) is an **adaptive math learning platform** featuring algorithmically-generated puzzle types, real-time multiplayer battles, and step-by-step solutions for every problem. Every question is generated on the fly — there is no question database — so practice is infinite and never repeats. Difficulty adapts to each learner in real time.
 
-There isn't one canonical "puzzle count" — different parts of the codebase group content differently, and that's worth naming instead of collapsing into a single number: the server exposes **93 distinct `*-api` route pairs** (the real unit of "a puzzle type"), grouped under **69 topic areas** in the `/graph` prerequisite map, and the home-screen tile registry (`client/src/features/tiles.js`) lists **100+ tiles**, because several route pairs surface as more than one tile (e.g. an MCQ "gym" drill and a full-form drill on the same topic, via `foldInto`). Use whichever number matches what you're actually counting.
+There isn't one canonical "puzzle count" — different parts of the codebase group content differently, and that's worth naming instead of collapsing into a single number: the server exposes **93 distinct `*-api` route pairs** (the real unit of "a puzzle type"), grouped under **69 topic areas** in the `/graph` prerequisite map, and the home-screen tile registry (`client/src/features/tiles.js`) lists **94 home-grid tiles** (plus 6 hamburger-only entries, 100 tiles total in `tiles.js`), because several route pairs surface as more than one tile (e.g. an MCQ "gym" drill and a full-form drill on the same topic, via `foldInto`). Use whichever number matches what you're actually counting.
 
 It is built to run on a single VPS — `tenali.fun` — with one Node process serving the React app, the puzzle APIs, the JWT auth, the Socket.IO Battle Arena, and the multi-language code playground.
 
@@ -182,7 +182,7 @@ A learner goes through **four simple stages** every time they play:
 ### 📋 What's inside each stage
 
 #### 1️⃣ Open `tenali.fun`
-- Lands on the **home grid** — 90+ colorful topic cards (blue = arithmetic, green = geometry, purple = algebra, orange = games)
+- Lands on the **home grid** — 94 colorful topic cards (blue = arithmetic, green = geometry, purple = algebra, orange = games)
 - **Optional login** with JWT — guest mode works fully without an account
 - Filter by search or browse the guided journey
 
@@ -357,7 +357,7 @@ JWT auth with **fail-fast** in production, `express-rate-limit`, CORS allowlist,
 </details>
 
 <details>
-<summary><b>📐 Algebra (15 types)</b></summary>
+<summary><b>📐 Algebra (14 types)</b></summary>
 
 | | Type | Endpoint |
 |:-:|-------|----------|
@@ -375,7 +375,6 @@ JWT auth with **fail-fast** in production, `express-rate-limit`, CORS allowlist,
 | 40 | Binomial Theorem | `/binomial-api` |
 | 41 | Functions Evaluation | `/funceval-api` |
 | 42 | Functions Gym (MCQ) | `/funcgym-api` |
-| 43 | Variation Direct/Indirect | `/variation-api` |
 
 </details>
 
@@ -384,20 +383,20 @@ JWT auth with **fail-fast** in production, `express-rate-limit`, CORS allowlist,
 
 | | Type | Endpoint |
 |:-:|-------|----------|
-| 44 | Trig (SOH-CAH-TOA) | `/trig-api` |
-| 45 | Inverse Trig | `/invtrig-api` |
-| 46 | Circular Measure | `/circmeasure-api` |
-| 47 | Inequalities | `/ineq-api` |
-| 48 | Coordinate Geometry | `/coordgeom-api` |
-| 49 | Section Formula | `/section-api` |
-| 50 | Linear Programming | `/linprog-api` |
-| 51 | Probability | `/prob-api` |
-| 52 | Permutations & Combinations | `/permcomb-api` |
-| 53 | Statistics | `/stats-api` |
-| 54 | Sets | `/sets-api` |
-| 55 | Bearings | `/bearings-api` |
-| 56 | Matrices | `/matrix-api` |
-| 57 | Linear Algebra (56 missions) | `/linearalgebra-api` |
+| 43 | Trig (SOH-CAH-TOA) | `/trig-api` |
+| 44 | Inverse Trig | `/invtrig-api` |
+| 45 | Circular Measure | `/circmeasure-api` |
+| 46 | Inequalities | `/ineq-api` |
+| 47 | Coordinate Geometry | `/coordgeom-api` |
+| 48 | Section Formula | `/section-api` |
+| 49 | Linear Programming | `/linprog-api` |
+| 50 | Probability | `/prob-api` |
+| 51 | Permutations & Combinations | `/permcomb-api` |
+| 52 | Statistics | `/stats-api` |
+| 53 | Sets | `/sets-api` |
+| 54 | Bearings | `/bearings-api` |
+| 55 | Matrices | `/matrix-api` |
+| 56 | Linear Algebra (56 missions) | `/linearalgebra-api` |
 
 </details>
 
@@ -406,48 +405,51 @@ JWT auth with **fail-fast** in production, `express-rate-limit`, CORS allowlist,
 
 | | Type | Endpoint |
 |:-:|-------|----------|
-| 58 | LA Mission Quiz | `/la-mission-quiz-api` |
-| 59 | Vectors | `/vectors-api` |
-| 60 | Dot Products | `/dotprod-api` |
-| 61 | Dot Products Gym (MCQ) | `/dotprodgym-api` |
-| 62 | Transformations | `/transform-api` |
-| 63 | Mensuration | `/mensur-api` |
+| 57 | LA Mission Quiz | `/la-mission-quiz-api` |
+| 58 | Vectors | `/vectors-api` |
+| 59 | Dot Products | `/dotprod-api` |
+| 60 | Dot Products Gym (MCQ) | `/dotprodgym-api` |
+| 61 | Transformations | `/transform-api` |
+| 62 | Mensuration | `/mensur-api` |
 
 </details>
 
 <details>
-<summary><b>🎯 Calculus, Puzzles & Games (15+ types)</b></summary>
+<summary><b>🎯 Calculus, Puzzles & Games (31 types)</b></summary>
 
 | | Type | Endpoint |
 |:-:|-------|----------|
-| 64 | Pythagoras' Theorem | `/pythag-api` |
-| 65 | Heron's Formula | `/heron-api` |
-| 66 | Circle Theorems | `/circleth-api` |
-| 67 | Circle Geometry | `/circle-api` |
-| 68 | Logarithms | `/log-api` |
-| 69 | Differentiation | `/diff-api` |
-| 70 | Differential Equations | `/diffeq-api` |
-| 71 | Integration | `/integ-api` |
-| 72 | Limits | `/limits-api` |
-| 73 | Conic Sections | `/conics-api` |
-| 74 | Complex Numbers | `/complex-api` |
-| 75 | Angles | `/angles-api` |
-| 76 | Triangles | `/triangles-api` |
-| 77 | Polygons | `/polygons-api` |
-| 78 | Congruence | `/congruence-api` |
-| 79 | Similarity | `/similarity-api` |
-| 80 | Visual Math | `/visual-math-api` |
-| 81 | Conceptual | `/concept-api` |
-| 82 | Vocabulary (7,662 words) | `/vocab-api` |
-| 83 | GK (991 questions) | `/gk-api` |
-| 84 | Tatsavit | `/tatsavit-api` |
-| 85 | Sudoku | `/sudoku-api` |
-| 86 | Transfer scenarios | `/transfer-api` |
-| 87 | Darts | `/darts-api` |
-| 88 | Riddles | `/riddle-api` |
-| 89 | Square Root | `/sqrt-api` |
-| 90 | Squaring | `/squaring-api` |
-| 91 | Curiosity | `/curiosity-api` |
+| 63 | Pythagoras' Theorem | `/pythag-api` |
+| 64 | Heron's Formula | `/heron-api` |
+| 65 | Circle Theorems | `/circleth-api` |
+| 66 | Logarithms | `/log-api` |
+| 67 | Differentiation | `/diff-api` |
+| 68 | Differential Equations | `/diffeq-api` |
+| 69 | Integration | `/integ-api` |
+| 70 | Limits | `/limits-api` |
+| 71 | Conic Sections | `/conics-api` |
+| 72 | Complex Numbers | `/complex-api` |
+| 73 | Angles | `/angles-api` |
+| 74 | Triangles | `/triangles-api` |
+| 75 | Polygons | `/polygons-api` |
+| 76 | Congruence | `/congruence-api` |
+| 77 | Similarity | `/similarity-api` |
+| 78 | Visual Math | `/visual-math-api` |
+| 79 | Conceptual | `/concept-api` |
+| 80 | Vocabulary (7,662 words) | `/vocab-api` |
+| 81 | GK (991 questions) | `/gk-api` |
+| 82 | Tatsavit | `/tatsavit-api` |
+| 83 | Sudoku | `/sudoku-api` |
+| 84 | Transfer scenarios | `/transfer-api` |
+| 85 | Darts | `/darts-api` |
+| 86 | Riddles | `/riddle-api` |
+| 87 | Square Root | `/sqrt-api` |
+| 88 | Squaring | `/squaring-api` |
+| 89 | Curiosity | `/curiosity-api` |
+| 90 | Treasure Hunt | `/treasurehunt-api` |
+| 91 | Matrix Mystics | `/matrixmystics-api` |
+| 92 | Word Creator | `/wordcreator-api` |
+| 93 | Contrast Challenge | `/contrast-api` |
 
 </details>
 
@@ -620,7 +622,7 @@ Go beyond the mission statement. Describe Tenali as a system: the users (student
 **3. Current State of the Repository — What Has Been Done So Far**
 Walk through the repository and describe what already exists:
 - Tech stack (frontend, backend, database, auth, deployment).
-- Implemented features (the 69 puzzle types, adaptive difficulty, Battle Arena multiplayer, step-by-step explanations, the code playground, auth, etc.).
+- Implemented features (the 93 puzzle types across 69 topic areas, adaptive difficulty, Battle Arena multiplayer, step-by-step explanations, the code playground, auth, etc.).
 
 **4. Gaps Observed in the Code**
 This is the most important section. List concrete weaknesses, bugs, missing features, or design problems you found while reading the code. You can also pick issues stated on the Tenali GitHub repo and solve them. For each gap, include:
