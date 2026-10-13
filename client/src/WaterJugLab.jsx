@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { QuizLayout } from './App';
 import './WaterJugLab.css';
 
@@ -34,10 +34,12 @@ function IntroJourney({ onComplete }) {
   const [jugA, setJugA] = useState(0);
   const [jugB, setJugB] = useState(0);
 
-  useEffect(() => {
+  const [prevLevel, setPrevLevel] = useState(level);
+  if (prevLevel !== level) {
+    setPrevLevel(level);
     setJugA(0);
     setJugB(0);
-  }, [level]);
+  }
 
   /* Level 17 State (Impossible) */
   const [impTried, setImpTried] = useState(false);
@@ -665,6 +667,66 @@ export default function WaterJugLab({ onBack }) {
     setLoading(false);
   };
 
+  // BFS Shortest Path solver for Mentor Hint
+  const askMentorHint = useCallback(() => {
+    if (revealed) return;
+    if (!solvable) {
+      setRecommendedAction('declareImpossible');
+      return;
+    }
+
+    const queue = [[jugAVal, jugBVal, []]];
+    const visited = new Set();
+    visited.add(`${jugAVal},${jugBVal}`);
+
+    const getTransitions = (a, b) => {
+      const list = [];
+      // Fill A
+      if (a < jugA) list.push({ nextA: jugA, nextB: b, action: 'fillA' });
+      // Fill B
+      if (b < jugB) list.push({ nextA: a, nextB: jugB, action: 'fillB' });
+      // Empty A
+      if (a > 0) list.push({ nextA: 0, nextB: b, action: 'emptyA' });
+      // Empty B
+      if (b > 0) list.push({ nextA: a, nextB: 0, action: 'emptyB' });
+      // Pour A -> B
+      if (a > 0 && b < jugB) {
+        const amt = Math.min(a, jugB - b);
+        list.push({ nextA: a - amt, nextB: b + amt, action: 'pourAToB' });
+      }
+      // Pour B -> A
+      if (b > 0 && a < jugA) {
+        const amt = Math.min(b, jugA - a);
+        list.push({ nextA: a + amt, nextB: b - amt, action: 'pourBToA' });
+      }
+      return list;
+    };
+
+    let solutionPath = null;
+    while (queue.length > 0) {
+      const [a, b, path] = queue.shift();
+      if (a === target || b === target) {
+        solutionPath = path;
+        break;
+      }
+
+      for (const trans of getTransitions(a, b)) {
+        const key = `${trans.nextA},${trans.nextB}`;
+        if (!visited.has(key)) {
+          visited.add(key);
+          queue.push([trans.nextA, trans.nextB, [...path, trans.action]]);
+        }
+      }
+    }
+
+    if (solutionPath && solutionPath.length > 0) {
+      const nextAct = solutionPath[0];
+      setRecommendedAction(nextAct);
+    } else {
+      setRecommendedAction('undo');
+    }
+  }, [revealed, solvable, jugAVal, jugBVal, jugA, jugB, target]);
+
   // Auto-run solver for Kids Mode (difficulty === 0) to guide their steps
   useEffect(() => {
     if (phase === 'playing' && difficulty === 0 && solvable && !loading && !revealed) {
@@ -673,7 +735,7 @@ export default function WaterJugLab({ onBack }) {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [jugAVal, jugBVal, solvable, loading, revealed, phase, difficulty]);
+  }, [phase, difficulty, solvable, loading, revealed, askMentorHint]);
 
   const startGame = () => {
     setPhase('playing');
@@ -836,65 +898,7 @@ export default function WaterJugLab({ onBack }) {
     setFeedback('Undo Spell cast! Reverted one move.');
   };
 
-  // BFS Shortest Path solver for Mentor Hint
-  const askMentorHint = () => {
-    if (revealed) return;
-    if (!solvable) {
-      setRecommendedAction('declareImpossible');
-      return;
-    }
 
-    const queue = [[jugAVal, jugBVal, []]];
-    const visited = new Set();
-    visited.add(`${jugAVal},${jugBVal}`);
-
-    const getTransitions = (a, b) => {
-      const list = [];
-      // Fill A
-      if (a < jugA) list.push({ nextA: jugA, nextB: b, action: 'fillA' });
-      // Fill B
-      if (b < jugB) list.push({ nextA: a, nextB: jugB, action: 'fillB' });
-      // Empty A
-      if (a > 0) list.push({ nextA: 0, nextB: b, action: 'emptyA' });
-      // Empty B
-      if (b > 0) list.push({ nextA: a, nextB: 0, action: 'emptyB' });
-      // Pour A -> B
-      if (a > 0 && b < jugB) {
-        const amt = Math.min(a, jugB - b);
-        list.push({ nextA: a - amt, nextB: b + amt, action: 'pourAToB' });
-      }
-      // Pour B -> A
-      if (b > 0 && a < jugA) {
-        const amt = Math.min(b, jugA - a);
-        list.push({ nextA: a + amt, nextB: b - amt, action: 'pourBToA' });
-      }
-      return list;
-    };
-
-    let solutionPath = null;
-    while (queue.length > 0) {
-      const [a, b, path] = queue.shift();
-      if (a === target || b === target) {
-        solutionPath = path;
-        break;
-      }
-
-      for (const trans of getTransitions(a, b)) {
-        const key = `${trans.nextA},${trans.nextB}`;
-        if (!visited.has(key)) {
-          visited.add(key);
-          queue.push([trans.nextA, trans.nextB, [...path, trans.action]]);
-        }
-      }
-    }
-
-    if (solutionPath && solutionPath.length > 0) {
-      const nextAct = solutionPath[0];
-      setRecommendedAction(nextAct);
-    } else {
-      setRecommendedAction('undo');
-    }
-  };
 
   // Level 5: Player claims the puzzle is mathematically impossible
   const handleDeclareUnsolvable = () => {

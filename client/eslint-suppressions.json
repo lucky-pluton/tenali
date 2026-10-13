@@ -171,17 +171,6 @@
       "count": 1
     }
   },
-  "src/WaterJugLab.jsx": {
-    "no-unused-vars": {
-      "count": 7
-    },
-    "react-hooks/immutability": {
-      "count": 1
-    },
-    "react-hooks/set-state-in-effect": {
-      "count": 1
-    }
-  },
   "src/components/GlossaryText.jsx": {
     "react-hooks/set-state-in-effect": {
       "count": 1
