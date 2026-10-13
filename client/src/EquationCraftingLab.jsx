@@ -23,12 +23,6 @@ export default function EquationCraftingLab({ onBack }) {
   const [results, setResults] = useState([]);
   const [submittedLabel, setSubmittedLabel] = useState('');
 
-  // Auto-select when there are exactly 2 blocks in the crucible
-  useEffect(() => {
-    if (crucible.length === 2) {
-      setSelectedIds([crucible[0].id, crucible[1].id]);
-    }
-  }, [crucible]);
   const [startTime, setStartTime] = useState(null);
 
   const [autoCountdown, setAutoCountdown] = useState(null);
@@ -96,7 +90,7 @@ export default function EquationCraftingLab({ onBack }) {
     ]
   };
 
-  const SAFE_MATH_REGEX = /^[\d\s\+\-\*\/\^\(\)\.xab]*$/;
+  const SAFE_MATH_REGEX = /^[\d\s+\-*^().xab/]*$/;
 
   const sanitizeMathExpr = (expr) => {
     if (typeof expr !== 'string') return null;
@@ -164,6 +158,7 @@ export default function EquationCraftingLab({ onBack }) {
         expr: r
       }));
     setCrucible(initialCrucible);
+    setSelectedIds(initialCrucible.length === 2 ? [initialCrucible[0].id, initialCrucible[1].id] : []);
     setStartTime(Date.now());
   };
 
@@ -248,8 +243,9 @@ export default function EquationCraftingLab({ onBack }) {
 
     // Replace combined blocks
     const nextCrucible = crucible.filter(b => b.id !== block1.id && b.id !== block2.id);
-    setCrucible([...nextCrucible, newBlock]);
-    setSelectedIds([]);
+    const updatedCrucible = [...nextCrucible, newBlock];
+    setCrucible(updatedCrucible);
+    setSelectedIds(updatedCrucible.length === 2 ? [updatedCrucible[0].id, updatedCrucible[1].id] : []);
     setSelectedCatalyst(null);
   };
 
@@ -264,7 +260,7 @@ export default function EquationCraftingLab({ onBack }) {
         expr: r
       }));
     setCrucible(initialCrucible);
-    setSelectedIds([]);
+    setSelectedIds(initialCrucible.length === 2 ? [initialCrucible[0].id, initialCrucible[1].id] : []);
     setSelectedCatalyst(null);
   };
 
@@ -330,7 +326,7 @@ export default function EquationCraftingLab({ onBack }) {
     }
 
     // Save results
-    const elapsed = Math.round((Date.now() - startTime) / 1000);
+    const elapsed = Math.round((new Date().getTime() - startTime) / 1000);
     setResults(prev => [
       ...prev,
       {
