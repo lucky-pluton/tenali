@@ -572,14 +572,72 @@ cd client && npm run lint
 
 ## 🧩 Add a New Puzzle
 
-> ⚠️ **New code goes in modular, per-feature files — not into `client/src/App.jsx` or `server/index.js`.** Both used to be one-file-does-everything monoliths (`App.jsx` is still 70,000+ lines and the single biggest source of PR merge conflicts, tracked in [issue #181](https://github.com/vicharanashala/tenali/issues/181)); the server side has already been split into `server/routes/*.js` and `client/src/features/tiles.js`, and that split — one puzzle/feature per file, registered through a small data table rather than by editing a shared file — is the pattern for everything new, not just puzzles. If a step below tells you to add to a specific module instead of a monolith, that's this rule in practice.
+Follow these steps to implement, register, and test a new puzzle:
 
-1. **Server route** — Add `GET /<type>-api/question` and `POST /<type>-api/check` in the matching group file under [`server/routes/`](server/routes/) (e.g. `algebra.js`, `geometry.js`) rather than `server/index.js` — the routes were extracted out of the monolith into these grouped router modules. Difficulty (0 – 3) drives parameter ranges.
-2. **Proxy** — Add the new prefix to `client/vite.config.js` proxy list.
-3. **Home-screen tile** — Add `{ key, name, subtitle, color, category }` to the registry in [`client/src/features/tiles.js`](client/src/features/tiles.js) — **not** `regularApps` in `App.jsx`. `category` should be one of the existing buckets (`number-foundations`, `shape-space`, `algebra`, `calculus`, `linear-algebra`, `everyday-maths`, `data-chance`, or `shelf` for non-topic features); this is the data [issue #201](https://github.com/vicharanashala/tenali/issues/201) and the rest of the home-grid restructuring plan will read from once the grid actually renders by bucket (today it still renders flat). If your puzzle is a drill variant of an existing tile (e.g. an MCQ "gym" version), set `foldInto: '<parent-key>'` instead of adding a new top-level tile.
-4. **Component** — Build the quiz component with the `makeQuizApp({ title, apiPath, diffLabels, placeholders, answerField })` factory. `modeMap` (the key → component mapping) still lives inline in `App.jsx` — it hasn't been extracted yet ([issue #199](https://github.com/vicharanashala/tenali/issues/199)) because its values are components defined throughout the file, not plain data. Add your entry there, but keep the change to that one line; don't restructure anything else in the file.
-5. **Explain** — Add a `case` to `generateExplanation()` in [`server/explanations.js`](server/explanations.js) so the Solve button works.
+> ⚠️ **Architecture Rule — Modular code over monoliths:**
+> Avoid adding large component bodies or business logic into `client/src/App.jsx` or `server/index.js`.
+> Server routes are modularized in `server/routes/*.js`, and home-grid tiles live in `client/src/features/tiles.js`. Keeping new features in standalone files prevents merge conflicts in the shared monolith (tracked in [issue #181](https://github.com/vicharanashala/tenali/issues/181)).
 
+### 1. Backend Route & Contract (`server/routes/`)
+Add `GET /<type>-api/question` and `POST /<type>-api/check` to the matching category router in [`server/routes/`](server/routes/) (e.g. `algebra.js`, `geometry.js`, `arithmetic.js`, `misc.js`):
+- **`GET /<type>-api/question`**: Reads `diff` (difficulty 0–3) from `req.query`, generates questions algorithmically, and returns `{ question, options, answer, ... }`.
+- **`POST /<type>-api/check`**: Validates the student's answer, returns `{ correct: boolean, explanation: string }`, or step-by-step solution when `{ solve: true }` is sent.
+- *(If introducing a new category router file, mount it with `app.use('/<type>-api', newRouter)` in `server/index.js`.)*
+
+### 2. Vite Dev Proxy (`client/vite.config.js`)
+Add your endpoint prefix to `server.proxy` in [`client/vite.config.js`](client/vite.config.js) so local requests forward to the Express server (port 4000):
+```javascript
+'/<type>-api': { target: 'http://127.0.0.1:4000', changeOrigin: true },
+```
+
+### 3. Home-Screen Tile Registry (`client/src/features/tiles.js`)
+Add your tile definition to the `TILES` array in [`client/src/features/tiles.js`](client/src/features/tiles.js) (**never** edit `regularApps` in `App.jsx`, as tile data is fully decoupled):
+```javascript
+{ key: '<type>', name: 'Puzzle Name', subtitle: 'Short description', color: 'blue', category: 'number-foundations' },
+```
+- **Categories**: `'number-foundations'`, `'shape-space'`, `'algebra'`, `'calculus'`, `'linear-algebra'`, `'everyday-maths'`, `'data-chance'`, or `'shelf'`.
+- **Colors**: `'blue'`, `'green'`, `'purple'`, `'orange'`, `'teal'`, `'indigo'`, or `'featured'`.
+- **Variants**: If this is a drill or MCQ gym variant of an existing topic, add `foldInto: '<parent-key>'`.
+
+### 4. Frontend Component & Registration (`client/src/App.jsx`)
+- **Standard Quiz**: Use the existing quiz factory in `App.jsx`:
+  ```javascript
+  const NewPuzzleApp = makeQuizApp({
+    title: 'Puzzle Name',
+    subtitle: 'Description',
+    apiPath: '/<type>-api',
+    diffLabels: ['Level 1', 'Level 2', 'Level 3', 'Level 4'],
+    placeholders: ['Enter value...'],
+    answerField: 'answer'
+  });
+  ```
+- **Custom Interactive Lab**: Build a dedicated component in `client/src/<FeatureName>.jsx`, export it, and import it into `App.jsx`.
+- **Register in `modeMap`**: Add `<type>: NewPuzzleApp` to `modeMap` in `client/src/App.jsx`.
+  > ℹ️ *Note on `modeMap`:* While tiles have been extracted to `tiles.js`, `modeMap` still lives in `client/src/App.jsx` pending router refactoring ([issue #181](https://github.com/vicharanashala/tenali/issues/181), [issue #199](https://github.com/vicharanashala/tenali/issues/199)). Keep your change in `App.jsx` strictly isolated to that single line to prevent merge conflicts.
+
+### 5. Step-by-Step Explanation (`server/explanations.js`)
+Add a `case '<type>':` to `generateExplanation()` in [`server/explanations.js`](server/explanations.js) so the Solve button and hint modal provide clear, worked-out explanations.
+
+### 6. Verification & Testing
+Before raising a PR, verify all checks pass:
+```bash
+# 1. Run server tests
+cd server && npm test
+
+# 2. Check client linting
+cd ../client && npx eslint src/features/tiles.js
+npm run lint
+
+# 3. Verify client build
+npm run build
+
+# 4. Manual end-to-end check
+# In terminal 1:
+cd ../server && npm start
+# In terminal 2:
+cd ../client && npm run dev
+# Open http://localhost:5173, select the puzzle, test questions, submit answers, and click Solve.
+```
 ---
 
 ## 📝 Contributor Onboarding (Mandatory)
