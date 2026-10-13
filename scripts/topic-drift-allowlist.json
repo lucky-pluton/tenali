@@ -1,0 +1,54 @@
+{
+  "$schema": "Topic drift allowlist recording known, intentional exceptions between modeMap, tiles, and server routes.",
+  "aliases": {
+    "contrastlist": {
+      "route": "contrast",
+      "reason": "Frontend tile and modeMap use 'contrastlist', backend route prefix is /contrast-api"
+    },
+    "language": {
+      "route": "wordcreator",
+      "reason": "Frontend tile and modeMap use 'language', backend route prefix is /wordcreator-api"
+    },
+    "missionquiz": {
+      "route": "la-mission-quiz",
+      "reason": "Frontend modeMap uses 'missionquiz', backend route prefix is /la-mission-quiz-api (launched internally from linearalgebra)"
+    }
+  },
+  "clientOnlyWithTile": {
+    "basic-arith-lab": "Interactive arithmetic visual lab folded into basicarith (client-only, no server route)",
+    "battle": "Live multiplayer fastest-finger duels via Socket.IO (client-only, no REST route)",
+    "custom": "Custom mixed quiz builder (client orchestrator, no server route)",
+    "detective": "Detective Agency math mystery solver (client-only, no server route)",
+    "equation-crafting-lab": "Interactive crucible equation crafting lab (client-only, no server route)",
+    "geocraft": "Interactive GeoCraft canvas geometry lab (client-only, no server route)",
+    "guess": "Binary magic mind-reading game folded into bases (client-only, no server route)",
+    "gym": "Adaptive workout across all gym drills (client orchestrator, no server route)",
+    "math-lab": "Visual Learning Universe lab hub (client-only, no server route)",
+    "qformula-concept": "Quadratic formula 5-stage concept lab (client-only, no server route)",
+    "randommix": "Adaptive cross-topic quiz generator (client orchestrator, no server route)",
+    "simul-concept": "Simultaneous equations 5-stage concept lab (client-only, no server route)",
+    "spot": "Twin Hunt common object puzzle (client-only, no server route)",
+    "vachana": "Mathematical Literacy Lab (client-only, no server route)",
+    "water-jug-lab": "Water jug GCD discovery lab (client-only, no server route)"
+  },
+  "internalOrNavigationModes": {
+    "carjourney": "Car journey rate problem interactive game module (no direct home tile or server route)",
+    "comic-addition": "Comic addition visual story module (no direct home tile or server route)",
+    "idlivada": "Idli Vada Sambar game module (no direct home tile or server route)",
+    "mensuration-lab": "Sub-lab within math-lab hub (no direct home tile or server route)",
+    "realworld": "Phenomenon pathway exploration hub (no direct home tile or server route)",
+    "trackProgress": "Progress tracking and milestone screen (no direct home tile or server route)",
+    "visual-math-lab-redux": "Experimental sub-lab within math-lab hub (no direct home tile or server route)"
+  },
+  "routableWithoutTile": {
+    "curiosity": "Curiosity mode registered in modeMap and /curiosity-api but lacks a home grid tile",
+    "riddle": "Math riddles registered in modeMap and /riddle-api but lacks a home grid tile",
+    "visual-math": "Visual math registered in modeMap and /visual-math-api but lacks a home grid tile (#218)"
+  },
+  "serverRoutesWithoutFrontend": {
+    "concept": "Conceptual questions route /concept-api not mapped to a frontend mode",
+    "darts": "Coordinate geometry dart board route /darts-api not mapped to a frontend mode",
+    "matrixmystics": "Standalone matrix game route /matrixmystics-api with dedicated redirect (#225)",
+    "transfer": "Transfer scenario route /transfer-api not mapped to a frontend mode"
+  }
+}

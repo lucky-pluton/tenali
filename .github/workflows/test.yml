@@ -24,6 +24,16 @@ jobs:
           node-version: '22'
       - run: node server/lib/bkt.test.js
 
+  topic-drift:
+    name: Topic registry drift check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/check-topic-drift.mjs
+
   # Lint the client. This catches broken imports and obvious errors before review.
   #
   # NON-BLOCKING (continue-on-error) until App.jsx is split up. `npm run lint`
