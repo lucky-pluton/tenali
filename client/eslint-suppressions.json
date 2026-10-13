@@ -187,17 +187,6 @@
       "count": 1
     }
   },
-  "src/components/HintSystem/HintModal.jsx": {
-    "no-empty": {
-      "count": 2
-    },
-    "no-unused-vars": {
-      "count": 3
-    },
-    "react-hooks/set-state-in-effect": {
-      "count": 1
-    }
-  },
   "src/components/HintSystem/hintUtils.js": {
     "no-empty": {
       "count": 1

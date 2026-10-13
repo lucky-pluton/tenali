@@ -8,18 +8,20 @@ export function HintModal({ concept, questionId, questionData, answerData, revea
   const [errorMsg, setErrorMsg] = useState('');
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const [isMinimized, setIsMinimized] = useState(true);
-  const [portalTarget, setPortalTarget] = useState(null);
+  const portalTarget = typeof document !== 'undefined' ? document.body : null;
   const [activeAccordionId, setActiveAccordionId] = useState(null);
   const [confirmingLevel, setConfirmingLevel] = useState(null);
   const effectiveQuestionId = questionId || (questionData ? (questionData._id || questionData.id || JSON.stringify(questionData)) : 'unknown');
 
-  useEffect(() => {
-    setPortalTarget(document.body);
+  const [prevQuestionId, setPrevQuestionId] = useState(effectiveQuestionId);
+  if (prevQuestionId !== effectiveQuestionId) {
+    setPrevQuestionId(effectiveQuestionId);
     setUnlockedLevels({});
     setErrorMsg('');
     setLoadingLevel(null);
     setCooldownRemaining(0);
-  }, [effectiveQuestionId]);
+    setConfirmingLevel(null);
+  }
 
   useEffect(() => {
     if (cooldownRemaining > 0) {
