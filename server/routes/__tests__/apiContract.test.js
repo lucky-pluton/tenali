@@ -55,7 +55,7 @@ describe.each(TOPICS)('%s-api contract', (topic) => {
     const res = await request(app)
       .post(`/${topic}-api/check`)
       .set('Content-Type', 'application/json')
-      .send({ answer: q.answer, userAnswer: String(q.answer) });
+      .send({ answer: q.answer, userAnswer: String(q.answer), ...(q.qToken ? { qToken: q.qToken } : {}) });
     expect(res.status).toBe(200);
     expect(typeof res.body.correct).toBe('boolean');
   });
